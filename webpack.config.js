@@ -2,6 +2,10 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
+const IS_DEV = (process.env.NODE_ENV === 'dev');
+
+const dirSrc = path.join(__dirname, 'src');
+
 const outputDirectory = 'dist';
 
 module.exports = {
@@ -22,6 +26,44 @@ module.exports = {
       {
         test: /\.css$/,
         use: ['style-loader', 'css-loader']
+      },
+      {
+        test: /\.scss$/,
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: IS_DEV
+            }
+          },
+          {
+            loader: 'sass-loader',
+            options: {
+              sourceMap: IS_DEV,
+              includePaths: [dirSrc]
+            }
+          }
+        ]
+      },
+      {
+        test: /\.less$/,
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: IS_DEV
+            }
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              sourceMap: IS_DEV,
+              includePaths: [dirSrc]
+            }
+          }
+        ]
       },
       {
         test: /\.(png|woff|woff2|eot|ttf|svg)$/,

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import vanillaCodingLogo from './vanilla_coding.png';
-import './App.css';
+import './App.less';
 
 export default class App extends Component {
   constructor(props) {

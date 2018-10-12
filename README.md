@@ -12,6 +12,10 @@ $ yarn dev (or npm run dev)
 # visit http://localhost:3000
 ```
 
+- HTML 수정: `/public/index.html`를 수정하시면 됩니다.
+- JS 수정: `/src/client/index.js`를 수정하시면 됩니다. (파일 이름은 변경하지 마세요.)
+- CSS 수정: 필요에 따라 `/src`디렉토리 내에  `.less`나 `.scss`를 생성하여 작업하시면 됩니다.
+
 ## 2. TODO
 
 A list of requirements below:
