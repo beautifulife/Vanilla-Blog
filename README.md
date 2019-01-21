@@ -227,5 +227,5 @@ Acceptance Criteria:
 
 ### Advanced
 
-1. [Firebase](https://firebase.google.com/)의 Database를 이용하여 관리자(블로그 글 수정,삭제,생성 등) 로그인 기능을 만들어 보세요.
+1. [Firebase](https://firebase.google.com/)의 Database를 이용하여 관리자(블로그 글 수정,삭제,생성 등) 로그인 기능을 만들어 보세요. (글 수정, 삭제, 생성 관련 서버 API도 생성해야 합니다.)
 2. [Firebase](https://firebase.google.com/)의 Database를 이용하여 테마 정보가 관리되게끔 만들어 보세요.
