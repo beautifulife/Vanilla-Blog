@@ -18,6 +18,8 @@ $ yarn dev (or npm run dev)
 
 ## 2. TODO
 
+**서버 관련 코드는 절대 수정해서는 안됩니다.**
+
 A list of requirements below:
 
 ### Step 1.
