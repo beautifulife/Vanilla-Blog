@@ -1,0 +1,25 @@
+.Article {
+  min-width: 500px;
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: left;
+
+  &__header {
+    text-align: center;
+
+    &__title {
+      font-family: 'Do Hyeon', sans-serif;
+      font-size: 2rem;
+    }
+
+    span {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 0.9rem;
+    }
+  }
+
+  &__contents {
+    line-height: 2rem;
+    font-family: 'Noto Serif KR', serif;
+  }
+}

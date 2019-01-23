@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css?family=Lato|Do+Hyeon|Noto+Serif+KR');
+
+html, body {
+  margin: 0;
+  width: 100vw;
+  // height: 100vh;
+  text-align: center;
+  font-family: 'Lato', sans-serif;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+h1 {
+  color: pink;
+  margin: 0;
+}
+
+ul, ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  all: unset;
+}
+
+.App {
+  padding: 10px;
+}
