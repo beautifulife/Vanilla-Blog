@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link, Switch, Redirect } from 'react-router-dom';
 import './App.scss';
-import Articles from './Articles';
+import ArticleList from './ArticleList';
 import Article from './Article';
 
 export default class App extends Component {
@@ -10,27 +10,95 @@ export default class App extends Component {
 
     this.state = {
       username: '',
+      articleList: [],
+      article: {},
+      pageIndexParameter: 0,
     };
 
-    this.articleId = '';
+    this.page = 0;
+    this.sort = 'asc';
+    this.isAjaxDone = true;
 
-    this.setArticleId = this.setArticleId.bind(this);
+    this.getClickEvent = this.getClickEvent.bind(this);
+    this.getScrollEvent = this.getScrollEvent.bind(this);
+    this.getSortToggleEvent = this.getSortToggleEvent.bind(this);
   }
 
   componentDidMount() {
-    fetch('/api/v1/username')
-      .then(res => res.json())
-      .then(user => this.setState({ username: user.username }));
+    this.getArticleList();
+    // fetch('/api/v1/username')
+    //   .then(res => res.json())
+    //   .then(user => this.setState({ username: user.username }));
   }
 
-  setArticleId(articleId) {
-    console.log('아티클 설정완료', articleId);
+  getArticleList() {
+    const { articleList } = this.state;
+    let { pageIndexParameter } = this.state;
 
-    this.articleId = articleId;
+    fetch(`/api/v1/articles?limit=10&${this.sort}&pageIndex=${pageIndexParameter}`)
+      .then(res => res.json())
+      .then((data) => {
+        console.log(data);
+
+        pageIndexParameter += 1;
+
+        this.setState({
+          articleList: [
+            ...articleList,
+            ...data.posts,
+          ],
+        });
+
+        if (data.posts.length === 10) {
+          this.isAjaxDone = true;
+        }
+      })
+      .catch(err => console.log(err));
+  }
+
+  getArticle(articleId) {
+    fetch(`/api/v1/articles/${articleId}`)
+      .then(res => res.json())
+      .then((data) => {
+        console.log(data);
+
+        this.setState({
+          article: data,
+        });
+      })
+      .catch(err => console.log(err));
+  }
+
+  getClickEvent(articleId) {
+    this.getArticle(articleId);
+  }
+
+  getScrollEvent() {
+    if (document.body.offsetHeight - (window.innerHeight + window.scrollY) <= 200 &&
+        this.isAjaxDone) {
+      console.log('now scroll add event call!');
+      this.isAjaxDone = false;
+      this.setState({
+        pageIndexParameter: 0,
+      }, this.getArticleList);
+      this.getArticleList();
+    }
+  }
+
+  getSortToggleEvent(sortValue) {
+    console.log('now sortToggle event call!');
+    if (sortValue === 'the newest') {
+      this.sort = 'asc';
+      this.getArticleList();
+    } else {
+      this.sort = 'dsc';
+      this.getArticleList();
+    }
   }
 
   render() {
-    const { username } = this.state;
+    const { username, articleList, article } = this.state;
+
     return (
       <div className="App">
         {username ? <h1>{`Hello ${username.toUpperCase()}`}</h1> : <h1>Loading.. please wait!</h1>}
@@ -40,8 +108,20 @@ export default class App extends Component {
             <hr />
             <Switch>
               <Redirect exact from="/" to="/articles" />
-              <Route exact path="/articles" render={props => <Articles {...props} onClick={this.setArticleId} />} />
-              <Route path="/articles/:article_title" render={props => <Article {...props} articleId={this.articleId} />} />
+              <Route
+                exact
+                path="/articles"
+                render={props => (
+                  <ArticleList
+                    {...props}
+                    articleList={articleList}
+                    onButtonClick={this.getSortToggleEvent}
+                    onItemClick={this.getClickEvent}
+                    onScroll={this.getScrollEvent}
+                  />
+                )}
+              />
+              <Route path="/articles/:article_title" render={props => <Article {...props} article={article} />} />
               <Route path="/topics" component={Topics} />
             </Switch>
           </div> 

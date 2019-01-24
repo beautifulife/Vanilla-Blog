@@ -7,39 +7,20 @@ class Article extends Component {
     super(props);
 
     this.state = {
-      article: {},
     };
   }
 
   componentDidMount() {
-    this.getArticle();
-  }
-
-  getArticle() {
-    const { articleId } = this.props;
-
-    fetch(`/api/v1/articles/${articleId}`)
-      .then(res => res.json())
-      .then((data) => {
-        console.log(data);
-
-        console.log(this);
-        this.setState({
-          article: data,
-        });
-      })
-      .catch(err => console.log(err));
   }
 
   render() {
-    const { article } = this.state;
-    const { articleId } = this.props;
+    const { article } = this.props;
 
     const renderArticle = () => {
       const localPublishedTime = new Date(article.created_at).toLocaleString();
       const commaSeperatedTags = article.tags.join(',');
 
-      console.log('renderArticle')
+      console.log('renderArticle');
 
       return (
         <div className="Article">
