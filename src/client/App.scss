@@ -10,7 +10,6 @@ html, body {
 }
 
 h1 {
-  color: pink;
   margin: 0;
 }
 
@@ -20,10 +19,17 @@ ul, ol {
   margin: 0;
 }
 
-a {
+a, input {
   all: unset;
 }
 
 .App {
   padding: 10px;
+}
+
+.App__title {
+  padding: 10px 0;
+  font-family: 'Do Hyeon', sans-serif;
+  letter-spacing: 2px;
+  color: pink;
 }

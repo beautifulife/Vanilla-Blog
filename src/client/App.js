@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Link, Switch, Redirect } from 'react-ro
 import './App.scss';
 import ArticleList from './ArticleList';
 import Article from './Article';
+import TagBar from './TagBar';
 
 export default class App extends Component {
   constructor(props) {
@@ -10,51 +11,107 @@ export default class App extends Component {
 
     this.state = {
       username: '',
+      tagsList: {},
       articleList: [],
       article: {},
-      pageIndexParameter: 0,
+      articleListByTag: [],
+      articleListPage: 0,
+      sortParameter: 'dsc',
     };
 
-    this.page = 0;
-    this.sort = 'asc';
-    this.isAjaxDone = true;
+    this.isScrollThrottle = true;
 
     this.getClickEvent = this.getClickEvent.bind(this);
     this.getScrollEvent = this.getScrollEvent.bind(this);
     this.getSortToggleEvent = this.getSortToggleEvent.bind(this);
+    this.getTagClickEvent = this.getTagClickEvent.bind(this);
   }
 
   componentDidMount() {
-    this.getArticleList();
-    // fetch('/api/v1/username')
-    //   .then(res => res.json())
-    //   .then(user => this.setState({ username: user.username }));
+    this.getArticleList(0, []);
+
+    fetch('/api/v1/username')
+      .then(res => res.json())
+      .then(user => this.setState({ username: user.username }));
   }
 
-  getArticleList() {
-    const { articleList } = this.state;
-    let { pageIndexParameter } = this.state;
-
-    fetch(`/api/v1/articles?limit=10&${this.sort}&pageIndex=${pageIndexParameter}`)
+  getArticleList(pageNum, articleList) {
+    fetch(`/api/v1/articles?sort=dsc&pageIndex=${pageNum}`)
       .then(res => res.json())
       .then((data) => {
-        console.log(data);
+        if (!data.posts.length) {
+          this.getTagName(articleList);
 
-        pageIndexParameter += 1;
+          this.setState({
+            articleList,
+          });
 
-        this.setState({
-          articleList: [
-            ...articleList,
-            ...data.posts,
-          ],
-        });
-
-        if (data.posts.length === 10) {
-          this.isAjaxDone = true;
+          console.log('data get finished');
+          return;
         }
+
+        articleList = articleList.concat(data.posts);
+        pageNum += 1;
+        this.getArticleList(pageNum, articleList);
       })
       .catch(err => console.log(err));
   }
+
+  getTagName(articleList) {
+    const promiseList = [];
+    const tagsList = {};
+
+    articleList.forEach((post) => {
+      post.tags.forEach((tag) => { tagsList[tag] = 0; });
+    });
+
+    Object.keys(tagsList).forEach((tagId) => {
+      const promiseItem = fetch(`/api/v1/tags/${tagId}`).then(res => res.json());
+
+      promiseList.push(promiseItem);
+    });
+
+    Promise.all(promiseList)
+      .then((data) => {
+        data.forEach((item) => {
+          tagsList[item.id] = item.name;
+        });
+
+        this.setState({
+          tagsList,
+        });
+      })
+      .catch(err => console.log(err));
+  }
+
+  // getArticledddddList() {
+  //   const { articleList, sortParameter } = this.state;
+  //   let { pageIndexParameter } = this.state;
+
+  //   fetch(`/api/v1/articles?limit=10&sort=${sortParameter}&pageIndex=${pageIndexParameter}`)
+  //     .then(res => res.json())
+  //     .then((data) => {
+  //       if (!data.posts.length) {
+  //         console.log('page done');
+  //         return;
+  //       }
+
+  //       console.log(data);
+
+  //       pageIndexParameter += 1;
+
+  //       this.setState({
+  //         articleList: [
+  //           ...articleList,
+  //           ...data.posts,
+  //         ],
+  //         pageIndexParameter,
+  //       });
+
+  //       this.isAjaxDone = true;
+  //     })
+  //     .catch(err => console.log(err));
+  // }
 
   getArticle(articleId) {
     fetch(`/api/v1/articles/${articleId}`)
@@ -75,37 +132,87 @@ export default class App extends Component {
 
   getScrollEvent() {
     if (document.body.offsetHeight - (window.innerHeight + window.scrollY) <= 200 &&
-        this.isAjaxDone) {
+        this.isScrollThrottle) {
       console.log('now scroll add event call!');
-      this.isAjaxDone = false;
+      const { articleListPage } = this.state;
+      const newPage = articleListPage + 1;
+
+      this.isScrollThrottle = false;
+
       this.setState({
-        pageIndexParameter: 0,
-      }, this.getArticleList);
-      this.getArticleList();
+        articleListPage: newPage,
+      });
+
+      setTimeout(() => { this.isScrollThrottle = true; }, 500);
     }
   }
 
   getSortToggleEvent(sortValue) {
+    const { articleList, articleListByTag } = this.state;
+    let newSortParameter;
+
     console.log('now sortToggle event call!');
+
     if (sortValue === 'the newest') {
-      this.sort = 'asc';
-      this.getArticleList();
+      newSortParameter = 'dsc';
     } else {
-      this.sort = 'dsc';
-      this.getArticleList();
+      newSortParameter = 'asc';
+    }
+
+    this.setState({
+      articleList: articleList.reverse(),
+      articleListByTag: articleListByTag.reverse(),
+      articleListPage: 0,
+      sortParameter: newSortParameter,
+    });
+  }
+
+  getTagClickEvent(tagId) {
+    const { articleList, sortParameter } = this.state;
+
+    if (sortParameter === 'asc') {
+      this.setState({
+        articleList: articleList.reverse(),
+        sortParameter: 'dsc',
+      }, this.makeTagSortedList.bind(this, tagId, articleList));
+    } else {
+      this.makeTagSortedList(tagId, articleList);
     }
   }
 
+  makeTagSortedList(tagId, articleList) {
+    const targetArticles = [];
+
+    articleList.forEach((article) => {
+      article.tags.forEach((tag) => {
+        if (tag === Number(tagId)) {
+          targetArticles.push(article);
+        }
+      });
+    });
+
+    this.setState({
+      articleListByTag: targetArticles,
+    });
+  }
+
   render() {
-    const { username, articleList, article } = this.state;
+    const { username, articleList, article, tagsList, articleListPage, articleListByTag, sortParameter } = this.state;
+
+    const limitArticleNumbers = (list) => {
+      const articleNumbers = (articleListPage + 1) * 10;
+
+      return list.slice(0, articleNumbers);
+    };
 
     return (
       <div className="App">
-        {username ? <h1>{`Hello ${username.toUpperCase()}`}</h1> : <h1>Loading.. please wait!</h1>}
         <Router>
           <div>
-            <Header />
-            <hr />
+            <Link to="/">
+              {username ? <h1 className="App__title">{`${username.toUpperCase()}`}</h1> : <h1 className="App__title">Loading.. please wait!</h1>}
+            </Link>
+            <Route exact path="/articles" render={props => (<TagBar {...props} tags={tagsList} onClick={this.getTagClickEvent} />)} />
             <Switch>
               <Redirect exact from="/" to="/articles" />
               <Route
@@ -114,7 +221,9 @@ export default class App extends Component {
                 render={props => (
                   <ArticleList
                     {...props}
-                    articleList={articleList}
+                    articleList={articleListByTag.length ? limitArticleNumbers(articleListByTag) : limitArticleNumbers(articleList)}
+                    tagList={tagsList}
+                    isNewest={sortParameter === 'dsc' || false}
                     onButtonClick={this.getSortToggleEvent}
                     onItemClick={this.getClickEvent}
                     onScroll={this.getScrollEvent}
@@ -122,54 +231,10 @@ export default class App extends Component {
                 )}
               />
               <Route path="/articles/:article_title" render={props => <Article {...props} article={article} />} />
-              <Route path="/topics" component={Topics} />
             </Switch>
-          </div> 
+          </div>
         </Router>
       </div>
     );
   }
 }
-
-const Header = () => (
-  <ul>
-    <li>
-      <Link to="/">Home</Link>
-    </li>
-    <li>
-      <Link to="/articles">Articles</Link>
-    </li>
-    <li>
-      <Link to="/topics">Topics</Link>
-    </li>
-  </ul>
-);
-
-const Empty = () => <h1>empty</h1>
-const Home = () => <h2>Home</h2>;
-const Topic = ({ match }) => <h3>Requested Param: {match.params.id}</h3>;
-const Topics = ({ match }) => {
-  console.log(match);
-
-  return (
-    <div>
-      <h2>Topics</h2>
-
-      <ul>
-        <li>
-          <Link to={`${match.url}/components`}>Components</Link>
-        </li>
-        <li>
-          <Link to={`${match.url}/props-v-state`}>Props v State</Link>
-        </li>
-      </ul>
-
-      <Route path={`${match.path}/:id`} component={Topic} />
-      <Route
-        exact
-        path={match.path}
-        render={() => <h3>Please select a topic.</h3>}
-      />
-    </div>
-  );
-};

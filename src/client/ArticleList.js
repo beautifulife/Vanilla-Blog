@@ -20,6 +20,22 @@ class ArticleList extends Component {
     window.addEventListener('scroll', this.handleScroll);
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { isNewest } = this.props;
+
+    if (nextProps.isNewest !== isNewest) {
+      if (nextProps.isNewest) {
+        this.setState({
+          sortInputValue: 'the newest',
+        });
+      } else {
+        this.setState({
+          sortInputValue: 'the oldest',
+        });
+      }
+    }
+  }
+
   componentWillUnmount() {
     window.removeEventListener('scroll', this.handleScroll);
   }
@@ -57,17 +73,19 @@ class ArticleList extends Component {
 
   render() {
     const { sortInputValue } = this.state;
-    const { match, articleList } = this.props;
-
-    console.log(match);
+    const { match, articleList, tagList } = this.props;
 
     const renderArticle = () => {
       return articleList.map((article, index) => {
         const keyIndex = article.title + (index + Math.random()).toString();
         const imageStyle = { backgroundImage: `url(${article.thumbnail_image_url}), url(${subImage})` };
         const localPublishedTime = new Date(article.created_at).toLocaleString();
-        const commaSeperatedTags = article.tags.join(',');
         const dashLinkedTitle = article.title.split(' ').join('-');
+        const articleTags = article.tags.map(tagId => (
+          <span key={tagId}>
+            {`#${tagList[tagId]}`}
+          </span>
+        ));
 
         return (
           <li key={keyIndex} className="ArticleList__list__item">
@@ -80,8 +98,10 @@ class ArticleList extends Component {
               </p>
               <span className="ArticleList__list__item__text__sub">{article.by}</span>
               <span className="ArticleList__list__item__text__sub">{localPublishedTime}</span>
-              <span className="ArticleList__list__item__text__sub">{commaSeperatedTags}</span>
-              <span className="ArticleList__list__item__text__sub">{article.comments_count}</span>
+              <span className="ArticleList__list__item__text__sub">
+                {articleTags}
+              </span>
+              <span className="ArticleList__list__item__text__sub">{article.comments_count} comments</span>
             </div>
           </li>
         );

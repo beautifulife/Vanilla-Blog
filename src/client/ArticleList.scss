@@ -1,4 +1,5 @@
 .ArticleList {
+  min-width: 600px;
   
   &__list {
     margin: 0;
@@ -7,9 +8,8 @@
 
     &__item {
       display: flex;
-      min-width: 500px;
-      max-width: 700px;
-      height: 120px;
+      width: 600px;
+      height: 130px;
       margin: 10px auto;
       padding: 10px;
       border-radius: 10px;
@@ -19,7 +19,7 @@
       }
 
       &__image {
-        width: 120px;
+        width: 130px;
         border-radius: 10px;
         background-size: cover;
         background-position: center center;
@@ -33,15 +33,40 @@
           display: inline-block;
           font-family: 'Do Hyeon', sans-serif;
           font-size: 1.3rem;
-          margin: 5px 0;
+          margin: 6px 0;
           cursor: pointer;
         }
 
         &__sub {
           display: block;
-          font-family: 'Noto Serif KR', serif;
-          font-size: 1rem;
+          margin-bottom: 3px;
+          font-size: 0.9rem;
+
+          span {
+            margin-right: 8px;
+          }
         }
+      }
+    }
+  }
+
+  &__sort {
+    width: 550px;
+    height: 30px;
+    margin: 0 auto;
+
+    &__btn {
+      width: 70px;
+      padding: 5px;
+      font-size: 0.8rem;
+      border: none;
+      border-radius: 5px;
+      box-shadow: 1px 3px 3px 3px rgba(128, 128, 128, 0.1);
+      transition: all 0.3s;
+
+      &:active {
+        box-shadow: 1px 1px 1px 1px rgba(128, 128, 128, 0.1);
+        transform: translateY(3px);
       }
     }
   }
