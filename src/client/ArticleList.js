@@ -73,7 +73,7 @@ class ArticleList extends Component {
 
   render() {
     const { sortInputValue } = this.state;
-    const { match, articleList, tagList } = this.props;
+    const { match, articleList, tagDictionary } = this.props;
 
     const renderArticle = () => {
       return articleList.map((article, index) => {
@@ -81,9 +81,10 @@ class ArticleList extends Component {
         const imageStyle = { backgroundImage: `url(${article.thumbnail_image_url}), url(${subImage})` };
         const localPublishedTime = new Date(article.created_at).toLocaleString();
         const dashLinkedTitle = article.title.split(' ').join('-');
+
         const articleTags = article.tags.map(tagId => (
           <span key={tagId}>
-            {`#${tagList[tagId]}`}
+            {`#${tagDictionary[tagId]}`}
           </span>
         ));
 

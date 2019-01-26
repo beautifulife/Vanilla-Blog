@@ -9,15 +9,15 @@ class TagBar extends Component {
   }
 
   render() {
-    const { tags } = this.props;
+    const { tagDictionary } = this.props;
 
     const renderTags = () => {
-      return Object.keys(tags).map((tagId, index) => {
+      return Object.keys(tagDictionary).map((tagId, index) => {
         const keyIndex = tagId + index.toString();
 
         return (
           <li key={keyIndex} className="TagBar__list__item" onClick={this.handleListClick.bind(this, tagId)}>
-            <span>{tags[tagId]}</span>
+            <span>{tagDictionary[tagId]}</span>
           </li>
         );
       });

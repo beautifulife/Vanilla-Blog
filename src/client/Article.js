@@ -14,11 +14,28 @@ class Article extends Component {
   }
 
   render() {
-    const { article } = this.props;
+    const { article, tagDictionary } = this.props;
 
     const renderArticle = () => {
       const localPublishedTime = new Date(article.created_at).toLocaleString();
-      const commaSeperatedTags = article.tags.join(',');
+
+      const articleComments = article.comments.map((comment) => {
+        const localCommentTime = new Date(comment.created_at).toLocaleString();
+
+        return (
+          <div key={comment.id}>
+            <span>{comment.by}</span>
+            <span>{localCommentTime}</span>
+            <p>{comment.text}</p>
+          </div>
+        );
+      });
+
+      const articleTags = article.tags.map(tagId => (
+        <span key={tagId}>
+          {`#${tagDictionary[tagId]}`}
+        </span>
+      ));
 
       console.log('renderArticle');
 
@@ -33,10 +50,12 @@ class Article extends Component {
           <div className="Article__contents">
             <p>{article.body}</p>
           </div>
+          <div className="Article__tags">
+            {articleTags}
+          </div>
           <hr />
-          <div className="Article__footer">
-            <div className="Article__footer__tags">{commaSeperatedTags}</div>
-            <div className="Article__footer__comments">{article.comments}</div>
+          <div className="Article__comments">
+            {articleComments}
           </div>
         </div>
       );
