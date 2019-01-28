@@ -15,29 +15,61 @@ class AdminPosts extends Component {
   }
 
   render() {
-    const { articleList } = this.props;
+    const { articleList, unAvailablePageDirection } = this.props;
 
     const articleControlList = articleList.map((article) => {
       const localPublishedTime = new Date(article.created_at).toLocaleString();
 
       return (
-        <li key={article.id} className="AdminPost__list__item">
-          <span>{article.title}</span>
-          <span>{article.by}</span>
-          <span>{localPublishedTime}</span>
-          <input type="button" value="remove" onClick={ev => this.handleRemoveButtonClick(ev, article.id)} />
-        </li>
+        <tr key={article.id}>
+          <td>{article.title}</td>
+          <td>{article.by}</td>
+          <td>{localPublishedTime}</td>
+          <td className="AdminPost__list__remove" onClick={ev => this.handleRemoveButtonClick(ev, article.id)}>remove</td>
+        </tr>
       );
     });
-    
+
+    const checkPageInputDisable = (pageDirection) => {
+      if (pageDirection === unAvailablePageDirection) {
+        return true;
+      }
+
+      return false;
+    };
+
     return (
       <Fragment>
-        <ul className="AdminPost__list">
-          {articleControlList}
-        </ul>
+        <div className="AdminPost__wrapper">
+          <table className="AdminPost__list">
+            <thead>
+              <tr>
+                <th>title</th>
+                <th>author</th>
+                <th>published time</th>
+                <th>remove</th>
+              </tr>
+            </thead>
+            <tbody>
+              {articleControlList}
+            </tbody>
+          </table>
+        </div>
         <div className="AdminPost__controller">
-          <input type="button" value="before" onClick={this.handlePageCotrollerClick.bind(this)} />
-          <input type="button" value="next" onClick={this.handlePageCotrollerClick.bind(this)} />
+          <input
+            type="button"
+            value="previous"
+            className={checkPageInputDisable('previous') ? 'disabled' : undefined}
+            onClick={this.handlePageCotrollerClick.bind(this)}
+            disabled={checkPageInputDisable('previous')}
+          />
+          <input
+            type="button"
+            value="next"
+            className={checkPageInputDisable('next') ? 'disabled' : undefined}
+            onClick={this.handlePageCotrollerClick.bind(this)}
+            disabled={checkPageInputDisable('next')}
+          />
         </div>
       </Fragment>
     );

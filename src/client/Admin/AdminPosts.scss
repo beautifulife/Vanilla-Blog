@@ -1,36 +1,70 @@
 .AdminPost {
+  &__wrapper {
+    height: 275px;
+  }
+
   &__list {
-    margin: 5px 0;
+    width: 100%;
+    margin-bottom: 5px;
     text-align: left;
 
-    &__item {
-      position: relative;
-      margin: 10px 0;
+    tr {
+      td {
+        padding: 1px 0;
+      }
 
-      span {
-        margin: 0px 5px;
+      th {
+        padding-bottom: 5px;
 
-        &:last-of-type {
-          margin-right: 75px;
+        &:first-of-type {
+          width: 300px;
+        }
+
+        &:nth-of-type(2) {
+          width: 65px;
+        }
+
+        &:nth-of-type(3) {
+          width: 235px;
         }
       }
+    }
 
-      input {
-        position: absolute;
-        right: 5px;
-        color: red;
-        cursor: pointer;
-      }
+    &__remove {
+      color: red;
+      cursor: pointer;
     }
   }
 
   &__controller {
-    margin: 5px 0;
+    margin-top: 15px;
 
     input {
       display: inline-block;
-      margin: 5px;
+      width: 70px;
+      height: 16px;
+      padding: 5px;
+      border: 1px solid;
+      line-height: 16px;
       cursor: pointer;
+
+      &:first-of-type {
+        border-radius: 15px 0 0 15px;
+      }
+
+      &:last-of-type {
+        border-left: none;
+        border-radius: 0 15px 15px 0;
+      }
+
+      &.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &:hover {
+        background-color: rgba(128, 128, 128, 0.1);
+      }
     }
   }
 }

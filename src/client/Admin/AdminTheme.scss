@@ -1,14 +1,15 @@
 .AdminTheme {
-  min-height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-wrap: row;
+  flex-wrap: wrap;
+  width: 680px;
+  padding: 10px 0;
 
   &__list {
     width: 100px;
     height: 120px;
-    margin: 10px;
+    margin: 15px;
 
     &__image {
       height: 100px;

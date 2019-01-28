@@ -9,7 +9,7 @@ class AdminTheme extends Component {
   }
 
   render() {
-    const themeList = ['white', 'black', 'lightgray', 'aliceblue', 'bisque'];
+    const themeList = ['white', 'black', 'SILVER', 'aliceblue', 'ORANGE', 'Aquamarine', 'Gold', 'Tomato', 'FloralWhite', 'RosyBrown'];
     const { selectedTheme } = this.props;
 
     const renderTheme = themeList.map((themeName) => {

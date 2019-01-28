@@ -19,6 +19,7 @@ export default class App extends Component {
       selectedTheme: 'white',
       sortParameter: 'dsc',
       tagsList: {},
+      unAvailablePageDirection: 'previous',
       username: '',
     };
 
@@ -26,6 +27,7 @@ export default class App extends Component {
 
     this.getClickEvent = this.getClickEvent.bind(this);
     this.getPageControlEvent = this.getPageControlEvent.bind(this);
+    this.getRemoveArticleEvent = this.getRemoveArticleEvent.bind(this);
     this.getScrollEvent = this.getScrollEvent.bind(this);
     this.getSortToggleEvent = this.getSortToggleEvent.bind(this);
     this.getTagClickEvent = this.getTagClickEvent.bind(this);
@@ -121,9 +123,23 @@ export default class App extends Component {
 
   getPageControlEvent(direction) {
     console.log('page 바꾸라고?', direction);
-    const { articleListPage } = this.state;
-    const addPageNumber = direction === 'before' ? -1 : 1;
+    const { articleList, articleListPage } = this.state;
+    const addPageNumber = direction === 'previous' ? -1 : 1;
     const newPage = articleListPage + addPageNumber;
+
+    if (newPage === 0) {
+      this.setState({
+        unAvailablePageDirection: 'previous',
+      });
+    } else if (articleList.length / 10 <= newPage + 1) {
+      this.setState({
+        unAvailablePageDirection: 'next',
+      });
+    } else {
+      this.setState({
+        unAvailablePageDirection: '',
+      });
+    }
 
     this.setState({
       articleListPage: newPage,
@@ -131,8 +147,24 @@ export default class App extends Component {
   }
 
   getRemoveArticleEvent(articleId) {
-    fetch(`/api/v1/articles/${articleId}`)
-      .then(res => console.log(res))
+    const { articleList } = this.state;
+    const newArticleList = articleList.slice();
+
+    for (let i = 0; i < newArticleList.length; i++) {
+      if (newArticleList[i].id === articleId) {
+        newArticleList.splice(i, 1);
+      }
+    }
+
+    fetch(`/api/v1/articles/${articleId}`, { method: 'DELETE' })
+      .then(res => res.json())
+      .then((data) => {
+        if (data.result === 'ok') {
+          this.setState({
+            articleList: newArticleList,
+          });
+        }
+      })
       .catch(err => console.err(err));
   }
 
@@ -238,6 +270,7 @@ export default class App extends Component {
       articleListPage,
       articleListByTag,
       sortParameter,
+      unAvailablePageDirection,
     } = this.state;
 
     const limitArticleNumbers = (list) => {
@@ -300,6 +333,7 @@ export default class App extends Component {
                     onProcess={this.resetState}
                     onPageControl={this.getPageControlEvent}
                     onRemove={this.getRemoveArticleEvent}
+                    unAvailablePageDirection={unAvailablePageDirection}
                   />
                 )}
               />

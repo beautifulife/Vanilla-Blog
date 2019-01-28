@@ -2,8 +2,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100vw;
-  height: 100vh;
   opacity: 100;
 
   &__title {
@@ -11,7 +9,8 @@
   }
 
   &__frame {
-    min-width: 600px;
+    overflow: auto;
+    width: 700px;
     margin: 20px;
     border: 1px solid;
     border-radius: 10px;
@@ -45,7 +44,8 @@
     }
 
     &__contents {
-      padding: 5px;
+      height: 350px;
+      padding: 10px;
     }
   }
 }

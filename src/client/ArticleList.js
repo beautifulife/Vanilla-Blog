@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Route, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './ArticleList.scss';
 import subImage from './asset/image/sub_img.png';
 
@@ -46,10 +46,10 @@ class ArticleList extends Component {
     onScroll();
   }
 
-  handleArticleClick(ev) {
+  handleArticleClick(ev, articleId) {
     const { onItemClick } = this.props;
 
-    onItemClick(ev.currentTarget.dataset.id);
+    onItemClick(articleId);
   }
 
   handleSortInputClick(ev) {
@@ -89,22 +89,22 @@ class ArticleList extends Component {
         ));
 
         return (
-          <li key={keyIndex} className="ArticleList__list__item">
-            <div className="ArticleList__list__item__image" style={imageStyle} />
-            <div className="ArticleList__list__item__text">
-              <p className="ArticleList__list__item__text__title" data-id={article.id} onClick={this.handleArticleClick}>
-                <Link to={`${match.url}/${dashLinkedTitle}`}>
+          <Link to={`${match.url}/${dashLinkedTitle}`} key={keyIndex}>
+            <li className="ArticleList__list__item" onClick={ev => this.handleArticleClick(ev, article.id)}>
+              <div className="ArticleList__list__item__image" style={imageStyle} />
+              <div className="ArticleList__list__item__text">
+                <p className="ArticleList__list__item__text__title">
                   {article.title}
-                </Link>
-              </p>
-              <span className="ArticleList__list__item__text__sub">{article.by}</span>
-              <span className="ArticleList__list__item__text__sub">{localPublishedTime}</span>
-              <span className="ArticleList__list__item__text__sub">
-                {articleTags}
-              </span>
-              <span className="ArticleList__list__item__text__sub">{article.comments_count} comments</span>
-            </div>
-          </li>
+                </p>
+                <span className="ArticleList__list__item__text__sub">{article.by}</span>
+                <span className="ArticleList__list__item__text__sub">{localPublishedTime}</span>
+                <span className="ArticleList__list__item__text__sub">
+                  {articleTags}
+                </span>
+                <span className="ArticleList__list__item__text__sub">{article.comments_count} comments</span>
+              </div>
+            </li>
+          </Link>
         );
       });
     };

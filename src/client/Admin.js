@@ -43,6 +43,7 @@ class Admin extends Component {
       onRemove,
       selectedTheme,
       onThemeControl,
+      unAvailablePageDirection,
     } = this.props;
 
     const renderAccordingToMenu = () => {
@@ -52,6 +53,7 @@ class Admin extends Component {
             articleList={articleList}
             onPageControlButtonClick={onPageControl}
             onRemoveButtonClick={onRemove}
+            unAvailablePageDirection={unAvailablePageDirection}
           />
         );
       }
