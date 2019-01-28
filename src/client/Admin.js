@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import './Admin.scss';
+import AdminPosts from './Admin/AdminPosts';
+import AdminTheme from './Admin/AdminTheme';
 
 class Admin extends Component {
   constructor(props) {
@@ -12,23 +15,58 @@ class Admin extends Component {
     this.handleMenuClick = this.handleMenuClick.bind(this);
   }
 
-  handleMenuClick(ev) {
+  componentDidMount() {
+    const { onProcess } = this.props;
+
+    onProcess();
+  }
+
+  handleMenuClick(ev, menu) {
     const { selectedMenu } = this.state;
 
-    // if (selectedMenu === ) {
-
-    // }
+    if (selectedMenu !== menu) {
+      this.setState({
+        selectedMenu: menu,
+      });
+    }
   }
 
   render() {
+    console.log(this.props);
+
     const { selectedMenu } = this.state;
+
+    const {
+      match,
+      articleList,
+      onPageControl,
+      onRemove,
+      selectedTheme,
+      onThemeControl,
+    } = this.props;
+
+    const renderAccordingToMenu = () => {
+      if (match.path === '/admin/posts') {
+        return (
+          <AdminPosts
+            articleList={articleList}
+            onPageControlButtonClick={onPageControl}
+            onRemoveButtonClick={onRemove}
+          />
+        );
+      }
+
+      if (match.path === '/admin/theme') {
+        return <AdminTheme selectedTheme={selectedTheme} onThemeClick={onThemeControl} />;
+      }
+    };
 
     const toggleMenuClass = (menu) => {
       if (selectedMenu === menu) {
-        return `Admin__frame__menu__${menu} active`;
+        return 'Admin__frame__menu__btn active';
       }
 
-      return `Admin__frame__menu__${menu}`;
+      return 'Admin__frame__menu__btn';
     };
 
     return (
@@ -36,21 +74,19 @@ class Admin extends Component {
         <h1 className="Admin__title">Hello Admin!</h1>
         <div className="Admin__frame">
           <div className="Admin__frame__menu">
-            <input
-              className={toggleMenuClass('posts')}
-              type="button"
-              value="포스트 관리"
-              onClick={this.handleMenuClick}
-            />
-            <input
+            <Link to="/admin/posts" className={toggleMenuClass('posts')} onClick={ev => this.handleMenuClick(ev, 'posts')}>
+              <span>포스트 관리</span>
+            </Link>
+            <Link
+              to="/admin/theme"
               className={toggleMenuClass('theme')}
-              type="button"
-              value="블로그 테마 관리"
-              onClick={this.handleMenuClick}
-            />
+              onClick={ev => this.handleMenuClick(ev, 'theme')}
+            >
+              <span>블로그 테마 관리</span>
+            </Link>
           </div>
           <div className="Admin__frame__contents">
-            타입에 따라 출력
+            {renderAccordingToMenu()}
           </div>
         </div>
       </div>

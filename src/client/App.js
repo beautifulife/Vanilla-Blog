@@ -16,6 +16,7 @@ export default class App extends Component {
       articleList: [],
       articleListByTag: [],
       articleListPage: 0,
+      selectedTheme: 'white',
       sortParameter: 'dsc',
       tagsList: {},
       username: '',
@@ -24,9 +25,11 @@ export default class App extends Component {
     this.isScrollThrottle = true;
 
     this.getClickEvent = this.getClickEvent.bind(this);
+    this.getPageControlEvent = this.getPageControlEvent.bind(this);
     this.getScrollEvent = this.getScrollEvent.bind(this);
     this.getSortToggleEvent = this.getSortToggleEvent.bind(this);
     this.getTagClickEvent = this.getTagClickEvent.bind(this);
+    this.getThemeControlEvent = this.getThemeControlEvent.bind(this);
     this.resetState = this.resetState.bind(this);
   }
 
@@ -116,6 +119,23 @@ export default class App extends Component {
     this.getArticle(articleId);
   }
 
+  getPageControlEvent(direction) {
+    console.log('page 바꾸라고?', direction);
+    const { articleListPage } = this.state;
+    const addPageNumber = direction === 'before' ? -1 : 1;
+    const newPage = articleListPage + addPageNumber;
+
+    this.setState({
+      articleListPage: newPage,
+    });
+  }
+
+  getRemoveArticleEvent(articleId) {
+    fetch(`/api/v1/articles/${articleId}`)
+      .then(res => console.log(res))
+      .catch(err => console.err(err));
+  }
+
   getScrollEvent() {
     if (document.body.offsetHeight - (window.innerHeight + window.scrollY) <= 200 &&
         this.isScrollThrottle) {
@@ -166,6 +186,17 @@ export default class App extends Component {
     }
   }
 
+  getThemeControlEvent(clickedTheme) {
+    const { selectedTheme } = this.state;
+    console.log(' 테마 체인지한다', clickedTheme)
+
+    if (selectedTheme !== clickedTheme) {
+      this.setState({
+        selectedTheme: clickedTheme,
+      });
+    }
+  }
+
   resetState() {
     this.setState({
       article: {},
@@ -198,7 +229,16 @@ export default class App extends Component {
   }
 
   render() {
-    const { username, articleList, article, tagsList, articleListPage, articleListByTag, sortParameter } = this.state;
+    const {
+      selectedTheme,
+      username,
+      articleList,
+      article,
+      tagsList,
+      articleListPage,
+      articleListByTag,
+      sortParameter,
+    } = this.state;
 
     const limitArticleNumbers = (list) => {
       const articleNumbers = (articleListPage + 1) * 10;
@@ -206,8 +246,25 @@ export default class App extends Component {
       return list.slice(0, articleNumbers);
     };
 
+    const showArticleByPage = (list) => {
+      const articleIndex = articleListPage * 10;
+
+      return list.slice(articleIndex, articleIndex + 10);
+    };
+
+    const colorMap = {
+      white: 'rgba(0, 0, 0, 0.7)',
+      black: 'white',
+    };
+
+    const styleByTheme = {
+      backgroundColor: selectedTheme,
+      color: colorMap[selectedTheme],
+      borderColor: colorMap[selectedTheme],
+    };
+
     return (
-      <div className="App">
+      <div style={styleByTheme} className="App">
         <Router>
           <div>
             <Link to="/">
@@ -232,7 +289,21 @@ export default class App extends Component {
                 )}
               />
               <Route path="/articles/:article_title" render={props => <Article {...props} article={article} tagDictionary={tagsList} />} />
-              <Route path="/admin" render={props => <Admin {...props} />} />
+              <Redirect exact from="/admin" to="/admin/posts" />
+              <Route
+                exact
+                path="/admin/posts"
+                render={props => (
+                  <Admin
+                    {...props}
+                    articleList={showArticleByPage(articleList)}
+                    onProcess={this.resetState}
+                    onPageControl={this.getPageControlEvent}
+                    onRemove={this.getRemoveArticleEvent}
+                  />
+                )}
+              />
+              <Route exact path="/admin/theme" render={props => <Admin {...props} selectedTheme={selectedTheme} onThemeControl={this.getThemeControlEvent} />} />
               <Route component={NoMatch} />
             </Switch>
           </div>

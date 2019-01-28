@@ -1,0 +1,36 @@
+.AdminPost {
+  &__list {
+    margin: 5px 0;
+    text-align: left;
+
+    &__item {
+      position: relative;
+      margin: 10px 0;
+
+      span {
+        margin: 0px 5px;
+
+        &:last-of-type {
+          margin-right: 75px;
+        }
+      }
+
+      input {
+        position: absolute;
+        right: 5px;
+        color: red;
+        cursor: pointer;
+      }
+    }
+  }
+
+  &__controller {
+    margin: 5px 0;
+
+    input {
+      display: inline-block;
+      margin: 5px;
+      cursor: pointer;
+    }
+  }
+}

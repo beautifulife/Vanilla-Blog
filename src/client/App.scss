@@ -6,11 +6,11 @@ html, body {
   text-align: center;
   font-family: 'Lato', sans-serif;
   box-sizing: border-box;
-  color: rgba(0, 0, 0, 0.8);
 }
 
 *, *:before, *:after {
   box-sizing: inherit;
+  border-color: inherit;
 }
 
 h1 {
@@ -29,6 +29,7 @@ a, input {
 
 .App {
   padding: 10px;
+  min-height: 100vh;
 }
 
 .App__title {
