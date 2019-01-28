@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import './ArticleList.scss';
 import subImage from './asset/image/sub_img.png';
 
-class ArticleList extends Component {
+export default class ArticleList extends Component {
   constructor(props) {
     super(props);
 
@@ -12,7 +13,6 @@ class ArticleList extends Component {
     };
 
     this.handleScroll = this.handleScroll.bind(this);
-    this.handleArticleClick = this.handleArticleClick.bind(this);
     this.handleSortInputClick = this.handleSortInputClick.bind(this);
   }
 
@@ -55,7 +55,6 @@ class ArticleList extends Component {
   handleSortInputClick(ev) {
     const { sortInputValue } = this.state;
     const { onButtonClick } = this.props;
-
     let newInputValue;
 
     if (sortInputValue === 'the oldest') {
@@ -77,7 +76,7 @@ class ArticleList extends Component {
 
     const renderArticle = () => {
       return articleList.map((article, index) => {
-        const keyIndex = article.title + (index + Math.random()).toString();
+        const keyIndex = article.title + index.toString();
         const imageStyle = { backgroundImage: `url(${article.thumbnail_image_url}), url(${subImage})` };
         const localPublishedTime = new Date(article.created_at).toLocaleString();
         const dashLinkedTitle = article.title.split(' ').join('-');
@@ -127,4 +126,12 @@ class ArticleList extends Component {
   }
 }
 
-export default ArticleList;
+ArticleList.propTypes = {
+  articleList: PropTypes.instanceOf(Array).isRequired,
+  match: PropTypes.instanceOf(Object).isRequired,
+  isNewest: PropTypes.bool.isRequired,
+  onButtonClick: PropTypes.func.isRequired,
+  onItemClick: PropTypes.func.isRequired,
+  onScroll: PropTypes.func.isRequired,
+  tagDictionary: PropTypes.instanceOf(Object).isRequired,
+};

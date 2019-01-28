@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import './TagBar.scss';
 
-class TagBar extends Component {
-  handleListClick(tagId, ev) {
+export default class TagBar extends Component {
+  handleTagClick(ev, tagId) {
     const { onClick } = this.props;
 
     onClick(tagId);
@@ -16,7 +17,7 @@ class TagBar extends Component {
         const keyIndex = tagId + index.toString();
 
         return (
-          <li key={keyIndex} className="TagBar__list__item" onClick={this.handleListClick.bind(this, tagId)}>
+          <li key={keyIndex} className="TagBar__list__item" onClick={ev => this.handleTagClick(ev, tagId)}>
             <span>{tagDictionary[tagId]}</span>
           </li>
         );
@@ -33,4 +34,7 @@ class TagBar extends Component {
   }
 }
 
-export default TagBar;
+TagBar.propTypes = {
+  onClick: PropTypes.func.isRequired,
+  tagDictionary: PropTypes.instanceOf(Object).isRequired,
+};

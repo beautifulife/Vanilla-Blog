@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import './Admin.scss';
 import AdminPosts from './Admin/AdminPosts';
 import AdminTheme from './Admin/AdminTheme';
 
-class Admin extends Component {
+export default class Admin extends Component {
   constructor(props) {
     super(props);
 
@@ -12,7 +13,7 @@ class Admin extends Component {
       selectedMenu: 'posts',
     };
 
-    this.handleMenuClick = this.handleMenuClick.bind(this);
+    this.toggleSelectedMenu = this.toggleSelectedMenu.bind(this);
   }
 
   componentDidMount() {
@@ -21,7 +22,7 @@ class Admin extends Component {
     onProcess();
   }
 
-  handleMenuClick(ev, menu) {
+  toggleSelectedMenu(ev, menu) {
     const { selectedMenu } = this.state;
 
     if (selectedMenu !== menu) {
@@ -32,18 +33,16 @@ class Admin extends Component {
   }
 
   render() {
-    console.log(this.props);
-
     const { selectedMenu } = this.state;
 
     const {
-      match,
       articleList,
+      match,
+      notAvailablePageDirection,
       onPageControl,
       onRemove,
-      selectedTheme,
       onThemeControl,
-      unAvailablePageDirection,
+      selectedTheme,
     } = this.props;
 
     const renderAccordingToMenu = () => {
@@ -53,7 +52,7 @@ class Admin extends Component {
             articleList={articleList}
             onPageControlButtonClick={onPageControl}
             onRemoveButtonClick={onRemove}
-            unAvailablePageDirection={unAvailablePageDirection}
+            notAvailablePageDirection={notAvailablePageDirection}
           />
         );
       }
@@ -76,13 +75,13 @@ class Admin extends Component {
         <h1 className="Admin__title">Hello Admin!</h1>
         <div className="Admin__frame">
           <div className="Admin__frame__menu">
-            <Link to="/admin/posts" className={toggleMenuClass('posts')} onClick={ev => this.handleMenuClick(ev, 'posts')}>
+            <Link to="/admin/posts" className={toggleMenuClass('posts')} onClick={ev => this.toggleSelectedMenu(ev, 'posts')}>
               <span>포스트 관리</span>
             </Link>
             <Link
               to="/admin/theme"
               className={toggleMenuClass('theme')}
-              onClick={ev => this.handleMenuClick(ev, 'theme')}
+              onClick={ev => this.toggleSelectedMenu(ev, 'theme')}
             >
               <span>블로그 테마 관리</span>
             </Link>
@@ -96,4 +95,13 @@ class Admin extends Component {
   }
 }
 
-export default Admin;
+Admin.propTypes = {
+  articleList: PropTypes.instanceOf(Array).isRequired,
+  match: PropTypes.instanceOf(Object).isRequired,
+  notAvailablePageDirection: PropTypes.instanceOf(Object).isRequired,
+  onPageControl: PropTypes.func.isRequired,
+  onProcess: PropTypes.func.isRequired,
+  onRemove: PropTypes.func.isRequired,
+  onThemeControl: PropTypes.func.isRequired,
+  selectedTheme: PropTypes.string.isRequired,
+};

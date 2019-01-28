@@ -20,8 +20,8 @@
   }
 
   &__contents {
-    line-height: 2rem;
     font-family: 'Noto Serif KR', serif;
+    line-height: 2rem;
   }
 
   &__tags {
@@ -33,7 +33,6 @@
       border-radius: 5px;
       font-size: 0.9rem;
       background-color: rgba(128, 128, 128, 0.1);
-      color: rgba(0, 0, 0, 0.7);
       cursor: pointer;
     }
   }
@@ -55,7 +54,6 @@
 
         &:last-of-type {
           font-size: 0.8rem;
-          color: rgba(0, 0, 0, 0.7);
         }
       }
   

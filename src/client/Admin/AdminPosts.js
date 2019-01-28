@@ -1,7 +1,8 @@
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 import './AdminPosts.scss';
 
-class AdminPosts extends Component {
+export default class AdminPosts extends Component {
   handlePageCotrollerClick(ev) {
     const { onPageControlButtonClick } = this.props;
 
@@ -76,4 +77,9 @@ class AdminPosts extends Component {
   }
 }
 
-export default AdminPosts;
+AdminPosts.propTypes = {
+  articleList: PropTypes.instanceOf(Array).isRequired,
+  unAvailablePageDirection: PropTypes.string.isRequired,
+  onPageControlButtonClick: PropTypes.func.isRequired,
+  onRemoveButtonClick: PropTypes.func.isRequired,
+};

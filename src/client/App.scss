@@ -9,8 +9,8 @@ html, body {
 }
 
 *, *:before, *:after {
-  box-sizing: inherit;
   border-color: inherit;
+  box-sizing: inherit;
   color: inherit;
 }
 
@@ -19,9 +19,9 @@ h1 {
 }
 
 ul, ol {
-  list-style: none;
-  padding: 0;
   margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 a, input {
@@ -29,16 +29,16 @@ a, input {
 }
 
 .App {
-  padding: 10px;
   min-width: 700px;
   min-height: 100vh;
-}
+  padding: 10px;
 
-.App__title {
-  padding: 10px 0;
-  font-family: 'Do Hyeon', sans-serif;
-  letter-spacing: 2px;
-  color: pink;
+  &__title {
+    padding: 10px 0;
+    font-family: 'Do Hyeon', sans-serif;
+    letter-spacing: 2px;
+    color: pink;
+  }
 
   span {
     cursor: pointer;

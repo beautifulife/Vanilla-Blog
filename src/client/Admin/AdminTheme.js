@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import './AdminTheme.scss';
 
-class AdminTheme extends Component {
+export default class AdminTheme extends Component {
   handleThemeClick(ev, themeName) {
     const { onThemeClick } = this.props;
 
@@ -14,7 +15,6 @@ class AdminTheme extends Component {
 
     const renderTheme = themeList.map((themeName) => {
       const themeStyle = { backgroundColor: themeName };
-      console.log(selectedTheme, themeName);
       const themeClassName = themeName === selectedTheme ? 'AdminTheme__list__image active' : 'AdminTheme__list__image';
 
       return (
@@ -35,4 +35,7 @@ class AdminTheme extends Component {
   }
 }
 
-export default AdminTheme;
+AdminTheme.propTypes = {
+  onThemeClick: PropTypes.func.isRequired,
+  selectedTheme: PropTypes.string.isRequired,
+};

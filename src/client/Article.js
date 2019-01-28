@@ -1,23 +1,17 @@
 import React, { Component, Fragment } from 'react';
-import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import './Article.scss';
 
-class Article extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-    };
-  }
-
-  componentDidMount() {
-  }
-
+export default class Article extends Component {
   render() {
     const { article, tagDictionary } = this.props;
 
     const renderArticle = () => {
-      const localPublishedTime = new Date(article.created_at).toLocaleString();
+      const articleTags = article.tags.map(tagId => (
+        <span key={tagId}>
+          {`#${tagDictionary[tagId]}`}
+        </span>
+      ));
 
       const articleComments = article.comments.map((comment) => {
         const localCommentTime = new Date(comment.created_at).toLocaleString();
@@ -31,13 +25,7 @@ class Article extends Component {
         );
       });
 
-      const articleTags = article.tags.map(tagId => (
-        <span key={tagId}>
-          {`#${tagDictionary[tagId]}`}
-        </span>
-      ));
-
-      console.log('renderArticle');
+      const localPublishedTime = new Date(article.created_at).toLocaleString();
 
       return (
         <div className="Article">
@@ -69,4 +57,7 @@ class Article extends Component {
   }
 }
 
-export default Article;
+Article.propTypes = {
+  article: PropTypes.instanceOf(Object).isRequired,
+  tagDictionary: PropTypes.instanceOf(Object).isRequired,
+};

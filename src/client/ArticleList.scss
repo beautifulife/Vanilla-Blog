@@ -34,8 +34,8 @@
       }
 
       &__text {
-        text-align: left;
         padding-left: 20px;
+        text-align: left;
 
         &__title {
           display: inline-block;
@@ -65,9 +65,9 @@
     &__btn {
       width: 70px;
       padding: 5px;
-      font-size: 0.8rem;
       border: none;
       border-radius: 5px;
+      font-size: 0.8rem;
       box-shadow: 1px 3px 3px 3px rgba(128, 128, 128, 0.1);
       transition: all 0.3s;
 

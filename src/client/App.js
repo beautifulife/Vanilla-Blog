@@ -1,15 +1,15 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link, Switch, Redirect } from 'react-router-dom';
 import './App.scss';
 import Admin from './Admin';
-import ArticleList from './ArticleList';
 import Article from './Article';
+import ArticleList from './ArticleList';
 import NoMatch from './NoMatch';
 import TagBar from './TagBar';
 
 export default class App extends Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
 
     this.state = {
       article: {},
@@ -19,19 +19,18 @@ export default class App extends Component {
       selectedTheme: 'white',
       sortParameter: 'dsc',
       tagsList: {},
-      unAvailablePageDirection: 'previous',
+      notAvailablePageDirection: 'previous',
       username: '',
     };
 
-    this.isScrollThrottle = true;
-
-    this.getClickEvent = this.getClickEvent.bind(this);
-    this.getPageControlEvent = this.getPageControlEvent.bind(this);
-    this.getRemoveArticleEvent = this.getRemoveArticleEvent.bind(this);
-    this.getScrollEvent = this.getScrollEvent.bind(this);
-    this.getSortToggleEvent = this.getSortToggleEvent.bind(this);
-    this.getTagClickEvent = this.getTagClickEvent.bind(this);
-    this.getThemeControlEvent = this.getThemeControlEvent.bind(this);
+    this.isDataProcessingDone = true;
+    this.changeTheme = this.changeTheme.bind(this);
+    this.controlAriticleListPage = this.controlAriticleListPage.bind(this);
+    this.controlArticleListPageByScroll = this.controlArticleListPageByScroll.bind(this);
+    this.getArticle = this.getArticle.bind(this);
+    this.removeArticle = this.removeArticle.bind(this);
+    this.toggleSortDirection = this.toggleSortDirection.bind(this);
+    this.toggleSortDirectionByTag = this.toggleSortDirectionByTag.bind(this);
     this.resetState = this.resetState.bind(this);
   }
 
@@ -43,14 +42,63 @@ export default class App extends Component {
       .then(user => this.setState({ username: user.username }));
   }
 
+  changeTheme(choosedTheme) {
+    const { selectedTheme } = this.state;
+
+    if (selectedTheme !== choosedTheme) {
+      this.setState({
+        selectedTheme: choosedTheme,
+      });
+    }
+  }
+
+  controlAriticleListPage(direction) {
+    const { articleList, articleListPage } = this.state;
+    const addPageNumber = direction === 'previous' ? -1 : 1;
+    const newPage = articleListPage + addPageNumber;
+
+    if (newPage === 0) {
+      this.setState({
+        notAvailablePageDirection: 'previous',
+      });
+    } else if (articleList.length / 10 <= newPage + 1) {
+      this.setState({
+        notAvailablePageDirection: 'next',
+      });
+    } else {
+      this.setState({
+        notAvailablePageDirection: '',
+      });
+    }
+
+    this.setState({
+      articleListPage: newPage,
+    });
+  }
+
+  controlArticleListPageByScroll() {
+    if (document.body.offsetHeight - (window.innerHeight + window.scrollY) <= 200 &&
+        this.isDataProcessingDone) {
+      const { articleListPage } = this.state;
+      const newPage = articleListPage + 1;
+
+      this.isDataProcessingDone = false;
+
+      this.setState({
+        articleListPage: newPage,
+      });
+
+      setTimeout(() => { this.isDataProcessingDone = true; }, 500);
+    }
+  }
+
   getArticle(articleId) {
     fetch(`/api/v1/articles/${articleId}`)
       .then(res => res.json())
       .then((data) => {
-        console.log(data);
         getComment(data);
       })
-      .catch(err => console.log(err));
+      .catch(err => console.error(err));
 
     const getComment = (article) => {
       fetch(`/api/v1/articles/${articleId}/comments`)
@@ -58,13 +106,11 @@ export default class App extends Component {
         .then((data) => {
           article.comments = data;
 
-          console.log(data);
-
           this.setState({
             article,
           });
         })
-        .catch(err => console.log(err));
+        .catch(err => console.error(err));
     };
   }
 
@@ -79,7 +125,6 @@ export default class App extends Component {
             articleList,
           });
 
-          console.log('data get finished');
           return;
         }
 
@@ -87,7 +132,7 @@ export default class App extends Component {
         pageNum += 1;
         this.getArticleList(pageNum, articleList);
       })
-      .catch(err => console.log(err));
+      .catch(err => console.error(err));
   }
 
   getTagName(articleList) {
@@ -114,39 +159,41 @@ export default class App extends Component {
           tagsList,
         });
       })
-      .catch(err => console.log(err));
+      .catch(err => console.error(err));
   }
 
-  getClickEvent(articleId) {
-    this.getArticle(articleId);
-  }
+  toggleSortDirection(sortValue) {
+    const { articleList, articleListByTag } = this.state;
+    let newSortParameter;
 
-  getPageControlEvent(direction) {
-    console.log('page 바꾸라고?', direction);
-    const { articleList, articleListPage } = this.state;
-    const addPageNumber = direction === 'previous' ? -1 : 1;
-    const newPage = articleListPage + addPageNumber;
-
-    if (newPage === 0) {
-      this.setState({
-        unAvailablePageDirection: 'previous',
-      });
-    } else if (articleList.length / 10 <= newPage + 1) {
-      this.setState({
-        unAvailablePageDirection: 'next',
-      });
+    if (sortValue === 'the newest') {
+      newSortParameter = 'dsc';
     } else {
-      this.setState({
-        unAvailablePageDirection: '',
-      });
+      newSortParameter = 'asc';
     }
 
     this.setState({
-      articleListPage: newPage,
+      articleList: articleList.reverse(),
+      articleListByTag: articleListByTag.reverse(),
+      articleListPage: 0,
+      sortParameter: newSortParameter,
     });
   }
 
-  getRemoveArticleEvent(articleId) {
+  toggleSortDirectionByTag(tagId) {
+    const { articleList, sortParameter } = this.state;
+
+    if (sortParameter === 'asc') {
+      this.setState({
+        articleList: articleList.reverse(),
+        sortParameter: 'dsc',
+      }, this.sortArticleListByTag.bind(this, tagId, articleList));
+    } else {
+      this.sortArticleListByTag(tagId, articleList);
+    }
+  }
+
+  removeArticle(articleId) {
     const { articleList } = this.state;
     const newArticleList = articleList.slice();
 
@@ -165,68 +212,7 @@ export default class App extends Component {
           });
         }
       })
-      .catch(err => console.err(err));
-  }
-
-  getScrollEvent() {
-    if (document.body.offsetHeight - (window.innerHeight + window.scrollY) <= 200 &&
-        this.isScrollThrottle) {
-      console.log('now scroll add event call!');
-      const { articleListPage } = this.state;
-      const newPage = articleListPage + 1;
-
-      this.isScrollThrottle = false;
-
-      this.setState({
-        articleListPage: newPage,
-      });
-
-      setTimeout(() => { this.isScrollThrottle = true; }, 500);
-    }
-  }
-
-  getSortToggleEvent(sortValue) {
-    const { articleList, articleListByTag } = this.state;
-    let newSortParameter;
-
-    console.log('now sortToggle event call!');
-
-    if (sortValue === 'the newest') {
-      newSortParameter = 'dsc';
-    } else {
-      newSortParameter = 'asc';
-    }
-
-    this.setState({
-      articleList: articleList.reverse(),
-      articleListByTag: articleListByTag.reverse(),
-      articleListPage: 0,
-      sortParameter: newSortParameter,
-    });
-  }
-
-  getTagClickEvent(tagId) {
-    const { articleList, sortParameter } = this.state;
-
-    if (sortParameter === 'asc') {
-      this.setState({
-        articleList: articleList.reverse(),
-        sortParameter: 'dsc',
-      }, this.makeTagSortedList.bind(this, tagId, articleList));
-    } else {
-      this.makeTagSortedList(tagId, articleList);
-    }
-  }
-
-  getThemeControlEvent(clickedTheme) {
-    const { selectedTheme } = this.state;
-    console.log(' 테마 체인지한다', clickedTheme)
-
-    if (selectedTheme !== clickedTheme) {
-      this.setState({
-        selectedTheme: clickedTheme,
-      });
-    }
+      .catch(err => console.error(err));
   }
 
   resetState() {
@@ -238,13 +224,9 @@ export default class App extends Component {
       sortParameter: 'dsc',
       tagsList: {},
     }, this.getArticleList.bind(this, 0, []));
-
-    fetch('/api/v1/username')
-      .then(res => res.json())
-      .then(user => this.setState({ username: user.username }));
   }
 
-  makeTagSortedList(tagId, articleList) {
+  sortArticleListByTag(tagId, articleList) {
     const targetArticles = [];
 
     articleList.forEach((article) => {
@@ -262,28 +244,16 @@ export default class App extends Component {
 
   render() {
     const {
-      selectedTheme,
-      username,
-      articleList,
       article,
-      tagsList,
-      articleListPage,
+      articleList,
       articleListByTag,
+      articleListPage,
+      selectedTheme,
       sortParameter,
-      unAvailablePageDirection,
+      tagsList,
+      username,
+      notAvailablePageDirection,
     } = this.state;
-
-    const limitArticleNumbers = (list) => {
-      const articleNumbers = (articleListPage + 1) * 10;
-
-      return list.slice(0, articleNumbers);
-    };
-
-    const showArticleByPage = (list) => {
-      const articleIndex = articleListPage * 10;
-
-      return list.slice(articleIndex, articleIndex + 10);
-    };
 
     const colorMap = {
       white: 'rgba(0, 0, 0, 0.7)',
@@ -296,14 +266,44 @@ export default class App extends Component {
       borderColor: colorMap[selectedTheme],
     };
 
+    const limitArticleNumbers = (list) => {
+      const articleNumbers = (articleListPage + 1) * 10;
+
+      return list.slice(0, articleNumbers);
+    };
+
+    const renderHeader = () => {
+      if (username) {
+        return (
+          <h1 className="App__title">
+            <span onClick={this.resetState}>
+              {`${username.toUpperCase()}`}
+            </span>
+          </h1>
+        );
+      }
+
+      return <h1 className="App__title">Loading.. please wait!</h1>;
+    };
+
+    const showArticleByPage = (list) => {
+      const articleIndex = articleListPage * 10;
+
+      return list.slice(articleIndex, articleIndex + 10);
+    };
+
     return (
       <div style={styleByTheme} className="App">
         <Router>
-          <div>
+          <React.Fragment>
             <Link to="/">
-              {username ? <h1 className="App__title"><span onClick={this.resetState}>{`${username.toUpperCase()}`}</span></h1> : <h1 className="App__title">Loading.. please wait!</h1>}
+              {renderHeader()}
             </Link>
-            <Route exact path="/articles" render={props => (<TagBar {...props} tagDictionary={tagsList} onClick={this.getTagClickEvent} />)} />
+            <Route
+              exact
+              path="/articles"
+              render={props => (<TagBar {...props} tagDictionary={tagsList} onClick={this.toggleSortDirectionByTag} />)}
+            />
             <Switch>
               <Redirect exact from="/" to="/articles" />
               <Route
@@ -315,13 +315,16 @@ export default class App extends Component {
                     articleList={articleListByTag.length ? limitArticleNumbers(articleListByTag) : limitArticleNumbers(articleList)}
                     tagDictionary={tagsList}
                     isNewest={sortParameter === 'dsc' || false}
-                    onButtonClick={this.getSortToggleEvent}
-                    onItemClick={this.getClickEvent}
-                    onScroll={this.getScrollEvent}
+                    onButtonClick={this.toggleSortDirection}
+                    onItemClick={this.getArticle}
+                    onScroll={this.controlArticleListPageByScroll}
                   />
                 )}
               />
-              <Route path="/articles/:article_title" render={props => <Article {...props} article={article} tagDictionary={tagsList} />} />
+              <Route
+                path="/articles/:article_title"
+                render={props => <Article {...props} article={article} tagDictionary={tagsList} />}
+              />
               <Redirect exact from="/admin" to="/admin/posts" />
               <Route
                 exact
@@ -331,16 +334,26 @@ export default class App extends Component {
                     {...props}
                     articleList={showArticleByPage(articleList)}
                     onProcess={this.resetState}
-                    onPageControl={this.getPageControlEvent}
-                    onRemove={this.getRemoveArticleEvent}
-                    unAvailablePageDirection={unAvailablePageDirection}
+                    onPageControl={this.controlAriticleListPage}
+                    onRemove={this.removeArticle}
+                    notAvailablePageDirection={notAvailablePageDirection}
                   />
                 )}
               />
-              <Route exact path="/admin/theme" render={props => <Admin {...props} selectedTheme={selectedTheme} onThemeControl={this.getThemeControlEvent} />} />
+              <Route
+                exact
+                path="/admin/theme"
+                render={props => (
+                  <Admin
+                    {...props}
+                    selectedTheme={selectedTheme}
+                    onThemeControl={this.changeTheme}
+                  />
+                )}
+              />
               <Route component={NoMatch} />
             </Switch>
-          </div>
+          </React.Fragment>
         </Router>
       </div>
     );
