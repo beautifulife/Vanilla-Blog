@@ -16,7 +16,7 @@ export default class AdminPosts extends Component {
   }
 
   render() {
-    const { articleList, unAvailablePageDirection } = this.props;
+    const { articleList, notAvailablePageDirection } = this.props;
 
     const articleControlList = articleList.map((article) => {
       const localPublishedTime = new Date(article.created_at).toLocaleString();
@@ -32,7 +32,7 @@ export default class AdminPosts extends Component {
     });
 
     const checkPageInputDisable = (pageDirection) => {
-      if (pageDirection === unAvailablePageDirection) {
+      if (pageDirection === notAvailablePageDirection) {
         return true;
       }
 
@@ -79,7 +79,7 @@ export default class AdminPosts extends Component {
 
 AdminPosts.propTypes = {
   articleList: PropTypes.instanceOf(Array).isRequired,
-  unAvailablePageDirection: PropTypes.string.isRequired,
+  notAvailablePageDirection: PropTypes.string.isRequired,
   onPageControlButtonClick: PropTypes.func.isRequired,
   onRemoveButtonClick: PropTypes.func.isRequired,
 };

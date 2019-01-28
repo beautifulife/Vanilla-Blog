@@ -96,12 +96,12 @@ export default class Admin extends Component {
 }
 
 Admin.propTypes = {
-  articleList: PropTypes.instanceOf(Array).isRequired,
+  articleList: PropTypes.instanceOf(Array),
   match: PropTypes.instanceOf(Object).isRequired,
-  notAvailablePageDirection: PropTypes.instanceOf(Object).isRequired,
-  onPageControl: PropTypes.func.isRequired,
-  onProcess: PropTypes.func.isRequired,
-  onRemove: PropTypes.func.isRequired,
-  onThemeControl: PropTypes.func.isRequired,
-  selectedTheme: PropTypes.string.isRequired,
+  notAvailablePageDirection: PropTypes.string,
+  onPageControl: PropTypes.func,
+  onProcess: PropTypes.func,
+  onRemove: PropTypes.func,
+  onThemeControl: PropTypes.func,
+  selectedTheme: PropTypes.string,
 };
